@@ -5,27 +5,24 @@ file=$2
 output=$3
 addtionalArg=$4
 
-mkdir -p /usercode
-# Java
-CLASSNAME=$(egrep "public\s+class\s+\w+" /sandbox/file.java | awk '{print $3}')
+CLASSNAME=$(egrep "public\s+class\s+\w+" /data/file.java | awk '{print $3}')
 if [ -n "${CLASSNAME}" ]; then
-	cp /sandbox/$file /usercode/$CLASSNAME.java
-	file=$CLASSNAME.java
-else
-	cp /sandbox/$file /usercode/$file
+    mv /data/$file /data/$CLASSNAME.java
+    file=$CLASSNAME.java
 fi
 
-START=$(date +%s.%2N)
 if [ "$output" = "" ]; then
-    $compiler /usercode/$file $addtionalArg
+    START=$(date +%s.%N)
+    $compiler /data/$file $addtionalArg
 else
-    $compiler /usercode/$file $addtionalArg
-	if [ $? -eq 0 ]; then
-		$output
-	fi
+    $compiler /data/$file $addtionalArg
+    START=$(date +%s.%N)
+    if [ $? -eq 0 ]; then
+        $output
+    fi
 fi
 
-END=$(date +%s.%2N)
+END=$(date +%s.%N)
 runtime=$(echo "$END - $START" | bc)
 
 echo -n "*-SANDBOX::ENDOFOUTPUT-*"${runtime}

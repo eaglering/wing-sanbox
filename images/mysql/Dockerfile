@@ -1,6 +1,7 @@
 FROM mysql:5.6
 MAINTAINER eaglering <442958506@qq.com>
 
+WORKDIR /data
 ADD script.sh /usr/local/bin/script.sh
 ADD sql_runner.sh /usr/local/bin/sql_runner.sh
 ADD dist /usr/local/dist

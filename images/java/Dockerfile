@@ -1,6 +1,7 @@
 FROM java:openjdk-8-alpine
 MAINTAINER eaglering <442958506@qq.com>
 
+WORKDIR /data
 ADD script.sh /usr/local/bin/script.sh
 ADD java_runner.sh /usr/local/bin/java_runner.sh
 RUN chmod 777 /usr/local/bin/script.sh \

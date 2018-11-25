@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd /usercode/
+cd /data
 
 for classfile in *.class; do
     classname=${classfile%.*}
