@@ -15,4 +15,4 @@ ADD server.key ${SERVER_KEY}
 RUN chmod 755 /usr/local/bin/wing.sh \
         && chmod 755 /usr/local/bin/wing
 
-ENTRYPOINT ["/usr/local/bin/wing"]
+CMD ["/usr/local/bin/wing"]
