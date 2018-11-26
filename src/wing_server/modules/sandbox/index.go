@@ -24,6 +24,18 @@ func (s *server) Compile(ctx context.Context, in *pb.Input) (*pb.Output, error) 
 	if script == nil {
 		return nil, errors.New("尚不支持的编译语言")
 	}
+	if in.Watchdog == 0 {
+		in.Watchdog = 600
+	}
+	if in.CpuShares == 0 {
+		in.CpuShares = 512 // CPU权重默认1024，这里分配一半
+	}
+	if in.Memory == "" {
+		in.Memory = "200m"
+	}
+	if in.MemorySwap == "" {
+		in.MemorySwap = "300m"
+	}
 	md5Ctx := md5.New()
 	md5Ctx.Write([]byte(in.Language + in.Data))
 	cipher := hex.EncodeToString(md5Ctx.Sum(nil))
@@ -43,8 +55,8 @@ func (s *server) Compile(ctx context.Context, in *pb.Input) (*pb.Output, error) 
 		command = fmt.Sprintf("%v -e NODE_PATH=/usr/local/lib/node_modules", command)
 	}
 
-	command = fmt.Sprintf("%v %v%v \"/usr/local/bin/script.sh %v %v %v %v\"",
-		command, config.DockerAddress, script.DockerName, script.CompilerName,
+	command = fmt.Sprintf("%v -c %v -m %v --memory-swap %v %v%v \"/usr/local/bin/script.sh %v %v %v %v\"",
+		command, in.CpuShares, in.Memory, in.MemorySwap, config.DockerAddress, script.DockerName, script.CompilerName,
 		script.Filename, script.OutputCmd, script.Arguments)
 	log.Println(command)
 

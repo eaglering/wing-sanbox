@@ -63,7 +63,10 @@ func main() {
 
 	ctx, cancel := context.WithTimeout(context.Background(), 120 * time.Second)
 	defer cancel()
-	r, err := c.Compile(ctx, &pb.Input{Language: "php", Data: "<?php phpinfo();", Watchdog:120})
+	r, err := c.Compile(ctx, &pb.Input{
+		Language: "php",
+		Data: "<?php phpinfo();",
+	})
 	if err != nil {
 		log.Fatalf("could not greet: %v", err)
 	}

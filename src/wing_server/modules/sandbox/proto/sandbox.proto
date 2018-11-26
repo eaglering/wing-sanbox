@@ -9,6 +9,9 @@ message Input {
     string language = 1;
     string data = 2;
     uint64 watchdog = 3;
+    uint64 cpuShares = 4;
+    string memory = 5;
+    string memorySwap = 6;
 }
 
 message Output {
