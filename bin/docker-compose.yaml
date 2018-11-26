@@ -2,7 +2,7 @@ version: "3"
 
 services:
   sandbox:
-    build: ./
+    image: registry.cn-shenzhen.aliyuncs.com/eaglering/wing-sandbox:v2.0
     ports: 
       - "15747:15747"
     environment:
