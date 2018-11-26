@@ -21,29 +21,29 @@
 package main
 
 import (
+	"context"
+	"crypto/tls"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/reflection"
+	"google.golang.org/grpc/status"
 	"log"
 	"net"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
-	"strings"
-	"context"
-	"google.golang.org/grpc/metadata"
-	"google.golang.org/grpc/status"
-	"google.golang.org/grpc/codes"
-	"wing_server/modules/sandbox"
-	"crypto/tls"
-	"google.golang.org/grpc/credentials"
 	"os"
+	"strings"
+	"wing_server/modules/sandbox"
 )
 
 const (
-	PORT = ":15747"
+	PORT  = ":15747"
 	TOKEN = "V9max5VOMkt3q="
 )
 
 var (
-	serverPem = os.Getenv("SERVER_PEM")
-	serverKey = os.Getenv("SERVER_KEY")
+	serverPem          = os.Getenv("SERVER_PEM")
+	serverKey          = os.Getenv("SERVER_KEY")
 	errMissingMetadata = status.Errorf(codes.InvalidArgument, "missing metadata")
 	errInvalidToken    = status.Errorf(codes.Unauthenticated, "invalid token")
 )

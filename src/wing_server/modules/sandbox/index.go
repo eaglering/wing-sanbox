@@ -2,24 +2,24 @@ package sandbox
 
 import (
 	"context"
-	pb "wing_server/modules/sandbox/proto"
-	"google.golang.org/grpc"
-	"os"
-	"log"
-	"errors"
-	"fmt"
-	"os/exec"
-	"wing_server/modules/sandbox/config"
 	"crypto/md5"
 	"encoding/hex"
+	"errors"
+	"fmt"
+	"google.golang.org/grpc"
 	"io/ioutil"
-	"strings"
+	"log"
+	"os"
+	"os/exec"
 	"strconv"
+	"strings"
+	"wing_server/modules/sandbox/config"
+	pb "wing_server/modules/sandbox/proto"
 )
 
 type server struct{}
 
-func (s *server) Compile (ctx context.Context, in *pb.Input) (*pb.Output, error) {
+func (s *server) Compile(ctx context.Context, in *pb.Input) (*pb.Output, error) {
 	script := config.Sandbox[in.Language]
 	if script == nil {
 		return nil, errors.New("尚不支持的编译语言")
@@ -60,28 +60,28 @@ func (s *server) Compile (ctx context.Context, in *pb.Input) (*pb.Output, error)
 	}
 	pos := strings.LastIndex(response, config.EOF)
 	data := response[0:pos]
-	runtime, err := strconv.ParseFloat(response[pos + len(config.EOF):], 64)
+	runtime, err := strconv.ParseFloat(response[pos+len(config.EOF):], 64)
 	if err != nil {
 		runtime = 0.00
 	}
 	return &pb.Output{
 		Language: script.Language,
-		Runtime: runtime,
-		Data: data,
-	}, nil;
+		Runtime:  runtime,
+		Data:     data,
+	}, nil
 }
 
-func Register (grpc *grpc.Server) {
+func Register(grpc *grpc.Server) {
 	env := os.Getenv("ENV")
 	if env == "production" {
 		for _, script := range config.Sandbox {
 			inspect := fmt.Sprintf("docker inspect %v%v >/dev/null", config.DockerAddress, script.DockerName)
-			cmd := exec.Command(inspect)
+			cmd := exec.Command("/bin/bash", "-c", inspect)
 			out, err := cmd.Output()
 			log.Println(err, string(out))
 			if err != nil || len(out) > 0 {
 				pull := fmt.Sprintf("docker pull %v%v >/dev/null", config.DockerAddress, script.DockerName)
-				cmd = exec.Command(pull)
+				cmd = exec.Command("/bin/bash", "-c", pull)
 				out, err := cmd.Output()
 				log.Println(err, string(out))
 				if err != nil || len(out) > 0 {
@@ -90,5 +90,5 @@ func Register (grpc *grpc.Server) {
 			}
 		}
 	}
-	pb.RegisterSandboxServer(grpc, &server{});
+	pb.RegisterSandboxServer(grpc, &server{})
 }

@@ -8,3 +8,5 @@ services:
     environment:
       - DOCKER_ADDRESS=registry.cn-shenzhen.aliyuncs.com/eaglering
       - ENV=production
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
