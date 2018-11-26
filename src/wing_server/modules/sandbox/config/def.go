@@ -23,7 +23,7 @@ var (
 			Filename:"file.py",
 			OutputCmd:"",
 			Arguments:"",
-			DockerName:"sandbox-python:v2.0",
+			DockerName:"wing-sandbox-python:v2.0",
 		},
 		"ruby": {
 			Language:"Ruby",
@@ -31,7 +31,7 @@ var (
 			Filename:"file.rb",
 			OutputCmd:"",
 			Arguments:"",
-			DockerName:"sandbox-ruby:v2.0",
+			DockerName:"wing-sandbox-ruby:v2.0",
 		},
 		"clojure": {
 			Language:"Clojure",
@@ -39,7 +39,7 @@ var (
 			Filename:"file.py",
 			OutputCmd:"",
 			Arguments:"",
-			DockerName:"sandbox-clojure:v2.0",
+			DockerName:"wing-sandbox-clojure:v2.0",
 		},
 		"php": {
 			Language:"PHP",
@@ -47,7 +47,7 @@ var (
 			Filename:"file.php",
 			OutputCmd:"",
 			Arguments:"",
-			DockerName:"sandbox-php:v2.0",
+			DockerName:"wing-sandbox-php:v2.0",
 		},
 		"nodejs": {
 			Language:"NodeJS",
@@ -55,7 +55,7 @@ var (
 			Filename:"file.js",
 			OutputCmd:"",
 			Arguments:"",
-			DockerName:"sandbox-nodejs:v2.0",
+			DockerName:"wing-sandbox-nodejs:v2.0",
 		},
 		"scala": {
 			Language:"Scala",
@@ -63,7 +63,7 @@ var (
 			Filename:"file.scala",
 			OutputCmd:"",
 			Arguments:"",
-			DockerName:"sandbox-scala:v2.0",
+			DockerName:"wing-sandbox-scala:v2.0",
 		},
 		"golang": {
 			Language:"Golang",
@@ -71,7 +71,7 @@ var (
 			Filename:"file.go",
 			OutputCmd:"",
 			Arguments:"",
-			DockerName:"sandbox-golang:v2.0",
+			DockerName:"wing-sandbox-golang:v2.0",
 		},
 		"cc": {
 			Language:"C/C++",
@@ -79,7 +79,7 @@ var (
 			Filename:"file.cpp",
 			OutputCmd:"/data/a.out",
 			Arguments:"",
-			DockerName:"sandbox-cc:v2.0",
+			DockerName:"wing-sandbox-cc:v2.0",
 		},
 		"java": {
 			Language:"Java",
@@ -87,7 +87,7 @@ var (
 			Filename:"file.java",
 			OutputCmd:"/usr/local/bin/javaRunner.sh",
 			Arguments:"",
-			DockerName:"sandbox-java:v2.0",
+			DockerName:"wing-sandbox-java:v2.0",
 		},
 		"vbnet": {
 			Language:"VB.Net",
@@ -95,7 +95,7 @@ var (
 			Filename:"file.vb",
 			OutputCmd:"'mono /data/file.exe'",
 			Arguments:"",
-			DockerName:"sandbox-vbnet:v2.0",
+			DockerName:"wing-sandbox-vbnet:v2.0",
 		},
 		"csharp": {
 			Language:"C#",
@@ -103,7 +103,7 @@ var (
 			Filename:"file.cs",
 			OutputCmd:"'mono /data/file.exe'",
 			Arguments:"",
-			DockerName:"sandbox-csharp:v2.0",
+			DockerName:"wing-sandbox-csharp:v2.0",
 		},
 		"bash": {
 			Language:"Bash",
@@ -111,7 +111,7 @@ var (
 			Filename:"file.sh",
 			OutputCmd:"",
 			Arguments:"",
-			DockerName:"sandbox-bash:v2.0",
+			DockerName:"wing-sandbox-bash:v2.0",
 		},
 		"oc": {
 			Language:"Objective-C",
@@ -119,7 +119,7 @@ var (
 			Filename:"file.m",
 			OutputCmd:" /data/a.out",
 			Arguments:"'-o /data/a.out -I/usr/include -L/usr/lib -lobjc -lgnustep-base -Wall -fconstant-string-class=NSConstantString'",
-			DockerName:"sandbox-oc:v2.0",
+			DockerName:"wing-sandbox-oc:v2.0",
 		},
 		"mysql": {
 			Language:"MySQL",
@@ -127,7 +127,7 @@ var (
 			Filename:"file.sql",
 			OutputCmd:"",
 			Arguments:"",
-			DockerName:"sandbox-mysql:v2.0",
+			DockerName:"wing-sandbox-mysql:v2.0",
 		},
 		"perl": {
 			Language:"Perl",
@@ -135,7 +135,7 @@ var (
 			Filename:"file.pl",
 			OutputCmd:"",
 			Arguments:"",
-			DockerName:"sandbox-perl:v2.0",
+			DockerName:"wing-sandbox-perl:v2.0",
 		},
 		"rust": {
 			Language:"Rust",
@@ -143,7 +143,7 @@ var (
 			Filename:"file.rs",
 			OutputCmd:"/data/a.out",
 			Arguments:"'-o /data/a.out'",
-			DockerName:"sandbox-rust:v2.0",
+			DockerName:"wing-sandbox-rust:v2.0",
 		},
 	}
 	DockerAddress = os.Getenv("DOCKER_ADDRESS")
