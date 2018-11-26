@@ -46,6 +46,7 @@ func (s *server) Compile(ctx context.Context, in *pb.Input) (*pb.Output, error) 
 		if err != nil {
 			return nil, errors.New("创建文件失败")
 		}
+		defer os.Remove(filename)
 	}
 	command := fmt.Sprintf("/usr/local/bin/wing.sh %d %v %v", in.Watchdog, filename, script.Filename)
 	switch in.Language {

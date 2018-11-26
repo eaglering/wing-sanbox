@@ -65,7 +65,7 @@ func main() {
 	defer cancel()
 	r, err := c.Compile(ctx, &pb.Input{
 		Language: "php",
-		Data: "<?php phpinfo();",
+		Data: "<?php usleep(1100000);echo 'hello world';",
 	})
 	if err != nil {
 		log.Fatalf("could not greet: %v", err)
