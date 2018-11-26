@@ -4,9 +4,9 @@ services:
   sandbox:
     image: registry.cn-shenzhen.aliyuncs.com/eaglering/wing-sandbox:v2.0
     ports: 
-      - "15747:15747"
+      - 15747:15747
     environment:
-      - DOCKER_ADDRESS=registry.cn-shenzhen.aliyuncs.com/eaglering
-      - ENV=production
+      - DOCKER_ADDRESS=registry.cn-shenzhen.aliyuncs.com/eaglering/
+      - STRICT=false
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock

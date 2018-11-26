@@ -72,20 +72,18 @@ func (s *server) Compile(ctx context.Context, in *pb.Input) (*pb.Output, error) 
 }
 
 func Register(grpc *grpc.Server) {
-	env := os.Getenv("ENV")
-	if env == "production" {
+	strict := os.Getenv("STRICT")
+	if strict == "true" {
 		for _, script := range config.Sandbox {
-			inspect := fmt.Sprintf("docker inspect %v%v >/dev/null", config.DockerAddress, script.DockerName)
+			inspect := fmt.Sprintf("docker inspect %v%v", config.DockerAddress, script.DockerName)
 			cmd := exec.Command("/bin/bash", "-c", inspect)
-			out, err := cmd.Output()
-			log.Println(err, string(out))
-			if err != nil || len(out) > 0 {
-				pull := fmt.Sprintf("docker pull %v%v >/dev/null", config.DockerAddress, script.DockerName)
+			_, err := cmd.Output()
+			if err != nil {
+				pull := fmt.Sprintf("docker pull %v%v", config.DockerAddress, script.DockerName)
 				cmd = exec.Command("/bin/bash", "-c", pull)
 				out, err := cmd.Output()
-				log.Println(err, string(out))
-				if err != nil || len(out) > 0 {
-					log.Fatal(err, string(out))
+				if err != nil {
+					log.Println(string(out))
 				}
 			}
 		}
