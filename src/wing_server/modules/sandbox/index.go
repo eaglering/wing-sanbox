@@ -62,7 +62,7 @@ func (s *server) Compile(ctx context.Context, in *pb.Input) (*pb.Output, error) 
 	log.Println(command)
 
 	cmd := exec.Command("/bin/bash", "-c", command)
-	out, err := cmd.Output()
+	out, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Println(err)
 		return nil, errors.New("执行脚本失败")

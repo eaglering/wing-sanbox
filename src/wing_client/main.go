@@ -64,14 +64,11 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 120 * time.Second)
 	defer cancel()
 	r, err := c.Compile(ctx, &pb.Input{
-		Language: "php",
-		Data: "<?php usleep(1100000);echo 'hello world';",
+		Language: "python",
+		Data: "print(\"Hello World\")",
 	})
 	if err != nil {
 		log.Fatalf("could not greet: %v", err)
-	}
-	if r.Data == "" {
-		log.Println("empty")
 	}
 	log.Printf("Greeting: %s", r)
 }
