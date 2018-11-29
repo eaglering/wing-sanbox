@@ -1,8 +1,15 @@
 syntax = "proto3";
 package proto;
 
+import "google/api/annotations.proto";
+
 service Sandbox {
-  rpc compile (Input) returns (Output) {}
+  rpc compile (Input) returns (Output) {
+    option (google.api.http) = {
+        post: "/api/sandbox/compile"
+        body: "*"
+    };
+  }
 }
 
 message Input {

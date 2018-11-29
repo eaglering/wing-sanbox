@@ -3665,7 +3665,7 @@ func TestServerIdleTimeout_AfterRequest(t *testing.T) {
 	}
 }
 
-// grpc-go closes the Request.Body currently with a Read.
+// grpc closes the Request.Body currently with a Read.
 // Verify that it doesn't race.
 // See https://github.com/grpc/grpc-go/pull/938
 func TestRequestBodyReadCloseRace(t *testing.T) {
