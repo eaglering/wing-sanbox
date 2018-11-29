@@ -23,8 +23,8 @@ const (
 var (
 	errMissingMetadata = status.Errorf(codes.InvalidArgument, "missing metadata")
 	errInvalidToken    = status.Errorf(codes.Unauthenticated, "invalid token")
-
-	gRpcAddr           = flag.String("grpc-port", ":15746", "The gRPC server port")
+	gRpcNetwork        = flag.String("grpc-network", "tcp", "The gRPC network")
+	GRpcAddr           = flag.String("grpc-port", ":15746", "The gRPC server port")
 )
 
 
@@ -61,7 +61,7 @@ func ensureValidToken(ctx context.Context, req interface{}, info *grpc.UnaryServ
 	return handler(ctx, req)
 }
 
-func Run (cxt context.Context, cert tls.Certificate) {
+func Run (ctx context.Context, cert tls.Certificate) {
 	opts := []grpc.ServerOption{
 		// The following grpc.ServerOption adds an interceptor for all unary
 		// RPCs. To configure an interceptor for streaming RPCs, see:
@@ -73,7 +73,11 @@ func Run (cxt context.Context, cert tls.Certificate) {
 	s := grpc.NewServer(opts...)
 	sandbox.Register(s)
 	reflection.Register(s)
-	lis, err := net.Listen("tcp", *gRpcAddr)
+	go func() {
+		<-ctx.Done()
+		s.GracefulStop()
+	}()
+	lis, err := net.Listen("tcp", *GRpcAddr)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}

@@ -4,9 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"flag"
-	"github.com/golang/glog"
 	"github.com/grpc-ecosystem/grpc-gateway/examples/gateway"
-	"github.com/grpc-ecosystem/grpc-gateway/examples/proto/examplepb"
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
@@ -15,6 +13,10 @@ import (
 	"log"
 	"net/http"
 	bGRpc "wing_server/bootstrap/grpc"
+	"github.com/golang/glog"
+	"fmt"
+	"google.golang.org/grpc/connectivity"
+	pb "wing_server/modules/sandbox/proto"
 )
 
 var (
@@ -31,9 +33,31 @@ func fetchToken() *oauth2.Token {
 	}
 }
 
+// healthz returns a simple health handler which returns ok.
+func healthz(conn *grpc.ClientConn) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain")
+		if s := conn.GetState(); s != connectivity.Ready {
+			http.Error(w, fmt.Sprintf("grpc server is %s", s), http.StatusBadGateway)
+			return
+		}
+		fmt.Fprintln(w, "ok")
+	}
+}
+
+func authorized(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if origin := r.Header.Get("Authorization"); origin != bGRpc.Token {
+			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+			return
+		}
+		h.ServeHTTP(w, r)
+	})
+}
+
 func Run(ctx context.Context, cert tls.Certificate) {
 	opts := gateway.Options{
-		Addr: ":8080",
+		Addr: *bGRpc.GRpcAddr,
 		GRPCServer: gateway.Endpoint{
 			Network: *network,
 			Addr:    *endpoint,
@@ -60,39 +84,29 @@ func Run(ctx context.Context, cert tls.Certificate) {
 	}()
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/healthz", healthzServer(conn))
+	mux.HandleFunc("/healthz", healthz(conn))
 
 	gwMux := gwruntime.NewServeMux(opts.Mux...)
-
-	for _, f := range []func(context.Context, *gwruntime.ServeMux, *grpc.ClientConn) error{
-		examplepb.RegisterEchoServiceHandler,
-		examplepb.RegisterStreamServiceHandler,
-		examplepb.RegisterABitOfEverythingServiceHandler,
-		examplepb.RegisterFlowCombinationHandler,
-		examplepb.RegisterResponseBodyServiceHandler,
-	} {
-		if err := f(ctx, gwMux, conn); err != nil {
-			return nil, err
-		}
+	if err := pb.RegisterSandboxHandler(ctx, gwMux, conn); err != nil {
+		log.Fatalf("Register sandbox handler fail, %v", err)
 	}
 
-	mux.Handle("/", gw)
+	mux.Handle("/", gwMux)
 
 	s1 := &http.Server{
 		Addr:    *endpoint,
-		Handler: allowCORS(mux),
+		Handler: authorized(mux),
 	}
 	go func() {
 		<-ctx.Done()
-		glog.Infof("Shutting down the http server")
+		log.Println("Shutting down the http server")
 		if err := s1.Shutdown(context.Background()); err != nil {
-			glog.Errorf("Failed to shutdown http server: %v", err)
+			log.Fatalf("Failed to shutdown http server: %v", err)
 		}
 	}()
 
 	log.Printf("Starting listening at %v", endpoint)
 	if err := s1.ListenAndServe(); err != http.ErrServerClosed {
-		glog.Errorf("Failed to listen and serve: %v", err)
-		return err
+		log.Fatalf("Failed to listen and serve: %v", err)
 	}
 }
