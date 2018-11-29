@@ -812,4 +812,4 @@ const (
 	SupportPackageIsVersion5 = true
 )
 
-const grpcUA = "grpc/" + Version
+const grpcUA = "grpc-go/" + Version
