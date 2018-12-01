@@ -23,8 +23,8 @@ const (
 var (
 	errMissingMetadata = status.Errorf(codes.InvalidArgument, "missing metadata")
 	errInvalidToken    = status.Errorf(codes.Unauthenticated, "invalid token")
-	gRpcNetwork        = flag.String("grpc-network", "tcp", "The gRPC network")
-	GRpcAddr           = flag.String("grpc-port", ":15746", "The gRPC server port")
+	Network            = flag.String("grpc-network", "tcp", "The gRPC network")
+	Address            = flag.String("grpc-port", ":15746", "The gRPC server port")
 )
 
 
@@ -73,17 +73,19 @@ func Run (ctx context.Context, cert tls.Certificate) {
 	s := grpc.NewServer(opts...)
 	sandbox.Register(s)
 	reflection.Register(s)
-	go func() {
-		<-ctx.Done()
-		s.GracefulStop()
-	}()
-	lis, err := net.Listen("tcp", *GRpcAddr)
+	lis, err := net.Listen(*Network, *Address)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+
 	go func() {
-		if err := s.Serve(lis); err != nil {
-			log.Fatalf("failed to serve: %v", err)
-		}
+		<-ctx.Done()
+		log.Println("Shutting down the grpc server")
+		s.GracefulStop()
 	}()
+
+	log.Printf("Starting grpc listening at %v", Address)
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
 }

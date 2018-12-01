@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/tls"
 	"flag"
-	"github.com/grpc-ecosystem/grpc-gateway/examples/gateway"
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
@@ -20,8 +19,7 @@ import (
 )
 
 var (
-	endpoint = flag.String("endpoint", ":15747", "endpoint of the gRPC service")
-	network  = flag.String("network", "tcp", `one of "tcp" or "unix". Must be consistent to -endpoint`)
+	Address = flag.String("endpoint", ":15747", "endpoint of the gRPC service")
 )
 
 // fetchToken simulates a token lookup and omits the details of proper token
@@ -56,18 +54,10 @@ func authorized(h http.Handler) http.Handler {
 }
 
 func Run(ctx context.Context, cert tls.Certificate) {
-	opts := gateway.Options{
-		Addr: *bGRpc.GRpcAddr,
-		GRPCServer: gateway.Endpoint{
-			Network: *network,
-			Addr:    *endpoint,
-		},
-	}
-
 	perRPC := oauth.NewOauthAccess(fetchToken())
 	conn, err := grpc.DialContext(
 		ctx,
-		*endpoint,
+		*bGRpc.Address,
 		grpc.WithPerRPCCredentials(perRPC),
 		grpc.WithTransportCredentials(
 			credentials.NewTLS(&tls.Config{InsecureSkipVerify: true}),
@@ -86,7 +76,7 @@ func Run(ctx context.Context, cert tls.Certificate) {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", healthz(conn))
 
-	gwMux := gwruntime.NewServeMux(opts.Mux...)
+	gwMux := gwruntime.NewServeMux()
 	if err := pb.RegisterSandboxHandler(ctx, gwMux, conn); err != nil {
 		log.Fatalf("Register sandbox handler fail, %v", err)
 	}
@@ -94,19 +84,22 @@ func Run(ctx context.Context, cert tls.Certificate) {
 	mux.Handle("/", gwMux)
 
 	s1 := &http.Server{
-		Addr:    *endpoint,
+		Addr:    *Address,
 		Handler: authorized(mux),
+		TLSConfig: &tls.Config{
+			Certificates: []tls.Certificate{cert},
+		},
 	}
 	go func() {
 		<-ctx.Done()
 		log.Println("Shutting down the http server")
-		if err := s1.Shutdown(context.Background()); err != nil {
+		if err := s1.Shutdown(ctx); err != nil {
 			log.Fatalf("Failed to shutdown http server: %v", err)
 		}
 	}()
 
-	log.Printf("Starting listening at %v", endpoint)
-	if err := s1.ListenAndServe(); err != http.ErrServerClosed {
+	log.Printf("Starting gateway listening at %v", Address)
+	if err := s1.ListenAndServeTLS("", ""); err != http.ErrServerClosed {
 		log.Fatalf("Failed to listen and serve: %v", err)
 	}
 }

@@ -28,6 +28,9 @@ import (
 	"os"
 	bGateway "wing_server/bootstrap/gateway"
 	bGRpc "wing_server/bootstrap/grpc"
+	"google.golang.org/grpc/testdata"
+	"runtime"
+	"time"
 )
 
 var (
@@ -38,15 +41,26 @@ var (
 func main() {
 	flag.Parse()
 
-	ctx := context.Background()
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
+	pCtx := context.Background()
+	ctx, cancel :=  context.WithCancel(pCtx)
 
+	if runtime.GOOS == "windows" {
+		serverPem = testdata.Path("server1.pem")
+		serverKey = testdata.Path("server1.key")
+	}
 	cert, err := tls.LoadX509KeyPair(serverPem, serverKey)
 	if err != nil {
 		log.Fatalf("failed to load key pair: %s", err)
 	}
 
-	bGRpc.Run(ctx, cert)
-	bGateway.Run(ctx, cert)
+	go func() {
+		defer cancel()
+		bGRpc.Run(ctx, cert)
+	}()
+	go func() {
+		defer cancel()
+		bGateway.Run(ctx, cert)
+	}()
+	<-ctx.Done()
+	time.Sleep(time.Second)
 }

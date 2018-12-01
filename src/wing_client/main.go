@@ -29,11 +29,7 @@ import (
 	"golang.org/x/oauth2"
 	"google.golang.org/grpc/credentials"
 	"crypto/tls"
-)
-
-const (
-	PORT = ":15747"
-	TOKEN = "V9max5VOMkt3q="
+	bGRpc "wing_server/bootstrap/grpc"
 )
 
 // fetchToken simulates a token lookup and omits the details of proper token
@@ -41,7 +37,7 @@ const (
 // https://godoc.org/golang.org/x/oauth2
 func fetchToken() *oauth2.Token {
 	return &oauth2.Token{
-		AccessToken: TOKEN,
+		AccessToken: bGRpc.Token,
 	}
 }
 
@@ -54,7 +50,7 @@ func main() {
 		),
 	}
 	// Set up a connection to the server.
-	conn, err := grpc.Dial(PORT, opts...)
+	conn, err := grpc.Dial(*bGRpc.Address, opts...)
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
@@ -65,7 +61,7 @@ func main() {
 	defer cancel()
 	r, err := c.Compile(ctx, &pb.Input{
 		Language: "php",
-		Data: "<?php usleep(1100000);echo \"Hello World\";",
+		Data: "<?php usleep(10100000);echo \"Hello World\";",
 	})
 	if err != nil {
 		log.Fatalf("could not greet: %v", err)

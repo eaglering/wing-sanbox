@@ -25,7 +25,7 @@ func (s *server) Compile(ctx context.Context, in *pb.Input) (*pb.Output, error) 
 		return nil, errors.New("尚不支持的编译语言")
 	}
 	if in.Watchdog == 0 {
-		in.Watchdog = 600
+		in.Watchdog = 120
 	}
 	if in.CpuShares == 0 {
 		in.CpuShares = 512 // CPU权重默认1024，这里分配一半
