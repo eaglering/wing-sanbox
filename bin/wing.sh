@@ -11,7 +11,11 @@ DESTNAME=$1
 shift
 
 cont=$(docker create --cpus=1 -m 512M --rm "$@" 2>/dev/null)
-docker cp $FILENAME $cont:/data/$DESTNAME
+if [ -z "$cont" ]; then
+    echo "获取编译器失败"
+    exit 0
+fi
+docker cp $FILENAME $cont:/data/$DESTNAME >/dev/null 2>&1
 docker start -a $cont &
 code=$(timeout -t "${WATCHDOG}" docker wait "$cont" || true)
 
