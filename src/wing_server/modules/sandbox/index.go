@@ -62,14 +62,10 @@ func (s *server) Compile(ctx context.Context, in *pb.Input) (*pb.Output, error) 
 	log.Println(command)
 
 	cmd := exec.Command("/bin/bash", "-c", command)
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		log.Println(err)
-		return nil, errors.New("执行脚本失败")
-	}
+	out, _ := cmd.CombinedOutput()
 	response := string(out)
 	if response == "" || !strings.Contains(response, config.EOF) {
-		return nil, errors.New("执行超时")
+		return nil, errors.New(response)
 	}
 	pos := strings.LastIndex(response, config.EOF)
 	data := response[0:pos]
