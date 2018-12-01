@@ -10,7 +10,7 @@ shift
 DESTNAME=$1
 shift
 
-cont=$(docker create --cpus=1 -m 512M --rm "$@")
+cont=$(docker create --cpus=1 -m 512M --rm "$@" 2>/dev/null)
 docker cp $FILENAME $cont:/data/$DESTNAME
 docker start -a $cont &
 code=$(timeout -t "${WATCHDOG}" docker wait "$cont" || true)
