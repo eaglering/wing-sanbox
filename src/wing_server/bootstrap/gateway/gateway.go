@@ -4,17 +4,17 @@ import (
 	"context"
 	"crypto/tls"
 	"flag"
+	"fmt"
+	"github.com/golang/glog"
 	gwruntime "github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/oauth"
 	"log"
 	"net/http"
 	bGRpc "wing_server/bootstrap/grpc"
-	"github.com/golang/glog"
-	"fmt"
-	"google.golang.org/grpc/connectivity"
 	pb "wing_server/modules/sandbox/proto"
 )
 
@@ -45,9 +45,11 @@ func healthz(conn *grpc.ClientConn) http.HandlerFunc {
 
 func authorized(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if origin := r.Header.Get("Authorization"); origin != bGRpc.Token {
-			http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
-			return
+		if r.RequestURI != "/healthz" {
+			if origin := r.Header.Get("Authorization"); origin != bGRpc.Token {
+				http.Error(w, http.StatusText(http.StatusUnauthorized), http.StatusUnauthorized)
+				return
+			}
 		}
 		h.ServeHTTP(w, r)
 	})
