@@ -16,16 +16,16 @@ service Sandbox {
 }
 
 message Input {
-    string language = 1;
-    string data = 2;
-    uint64 watchdog = 3;
-    uint64 cpuShares = 4;
-    string memory = 5;
-    string memorySwap = 6;
+    string language = 1;   // 编译语言，参考def.go下Sandbox(key)
+    string data = 2;       // 编译内容
+    uint64 watchdog = 3;   // 编译时长(默认120秒)
+    uint64 cpuShares = 4;  // CPU权重默认1024，这里分配一半
+    string memory = 5;     // 内存(默认200m)
+    string memorySwap = 6; // 内存SWAP(默认300m)
 }
 
 message Output {
-    string language = 1;
-    double runtime = 2;
-    string data = 3;
+    string language = 1;  // 编译语言，参考def.go下Sandbox(language)
+    double runtime = 2;   // 运行时长
+    string data = 3;      // 运行结果
 }
